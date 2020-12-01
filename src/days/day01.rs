@@ -5,25 +5,19 @@ use itertools::Itertools;
 pub enum Day01 {}
 
 fn find_2020_pair(nums: &[u32]) -> (u32, u32) {
-    let v = nums
-        .iter()
+    nums.iter()
         .copied()
-        .combinations(2)
-        .find(|x| x[0] + x[1] == 2020)
-        .unwrap();
-
-    (v[0], v[1])
+        .tuple_combinations()
+        .find(|(a, b)| a + b == 2020)
+        .unwrap()
 }
 
 fn find_2020_triplet(nums: &[u32]) -> (u32, u32, u32) {
-    let v = nums
-        .iter()
+    nums.iter()
         .copied()
-        .combinations(3)
-        .find(|x| x.iter().sum::<u32>() == 2020)
-        .unwrap();
-
-    (v[0], v[1], v[2])
+        .tuple_combinations()
+        .find(|(a, b, c)| a + b + c == 2020)
+        .unwrap()
 }
 
 impl crate::Challenge for Day01 {
