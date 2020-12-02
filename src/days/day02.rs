@@ -34,9 +34,7 @@ impl FromStr for Line {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let re = Regex::new(r"([0-9]+)\-([0-9]+) (.): ([a-z]+)").unwrap();
-        let caps = re
-            .captures(s)
-            .ok_or_else(|| Error::RegexFail(re.clone(), s.into()))?;
+        let caps = re.try_captures(s)?;
         let lo = caps[1].parse()?;
         let hi = caps[2].parse()?;
         let c = caps[3].nth_char(0);

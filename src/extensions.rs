@@ -33,3 +33,14 @@ pub trait DebugExt: Debug {
 }
 
 impl<T: Debug> DebugExt for T {}
+
+pub trait RegexExt {
+    fn try_captures<'t>(&self, text: &'t str) -> Result<regex::Captures<'t>, crate::Error>;
+}
+
+impl RegexExt for regex::Regex {
+    fn try_captures<'t>(&self, text: &'t str) -> Result<regex::Captures<'t>, crate::Error> {
+        self.captures(text)
+            .ok_or_else(|| crate::Error::RegexFail(self.clone(), text.into()))
+    }
+}
