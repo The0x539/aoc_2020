@@ -1,6 +1,4 @@
-use std::io::BufRead;
-
-use itertools::Itertools;
+use crate::prelude::*;
 
 pub enum Day01 {}
 
@@ -20,13 +18,13 @@ fn find_2020_triplet(nums: &[u32]) -> (u32, u32, u32) {
         .unwrap()
 }
 
-impl crate::Challenge for Day01 {
+impl Challenge for Day01 {
     type Input = Vec<u32>;
     type Output1 = u32;
     type Output2 = u32;
 
-    fn read(data: std::io::BufReader<std::fs::File>) -> Self::Input {
-        data.lines().map(|s| s.unwrap().parse().unwrap()).collect()
+    fn read(data: File) -> Self::Input {
+        data.parse_lines()
     }
 
     fn part1(input: Self::Input) -> Self::Output1 {

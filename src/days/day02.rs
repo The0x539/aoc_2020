@@ -51,7 +51,7 @@ impl Challenge for Day02 {
     type Output2 = usize;
 
     fn read(data: File) -> Self::Input {
-        data.lines().map(|s| s.unwrap().parse().unwrap()).collect()
+        data.parse_lines()
     }
 
     fn part1(input: Self::Input) -> Self::Output1 {
