@@ -7,14 +7,6 @@ enum Part {
     Part2,
 }
 
-trait DebugExt: std::fmt::Debug {
-    fn dbg(&self) -> String {
-        format!("{:?}", self)
-    }
-}
-
-impl<T: std::fmt::Debug> DebugExt for T {}
-
 fn main() {
     let mut args = std::env::args();
     let _ = args.next().unwrap();

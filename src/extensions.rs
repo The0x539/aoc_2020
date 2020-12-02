@@ -25,3 +25,11 @@ pub trait BufReadExt: BufRead + Sized {
 }
 
 impl<T: BufRead> BufReadExt for T {}
+
+pub trait DebugExt: Debug {
+    fn dbg(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
+impl<T: Debug> DebugExt for T {}
