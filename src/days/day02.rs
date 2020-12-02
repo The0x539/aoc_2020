@@ -30,13 +30,15 @@ impl Line {
 }
 
 impl FromStr for Line {
-    type Err = ();
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let re = Regex::new(r"([0-9]+)\-([0-9]+) (.): ([a-z]+)").unwrap();
-        let caps = re.captures(s).unwrap();
-        let lo = caps[1].parse().unwrap();
-        let hi = caps[2].parse().unwrap();
+        let caps = re
+            .captures(s)
+            .ok_or_else(|| Error::RegexFail(re.clone(), s.into()))?;
+        let lo = caps[1].parse()?;
+        let hi = caps[2].parse()?;
         let c = caps[3].nth_char(0);
         let password = caps[4].into();
         Ok(Self::new(lo..=hi, c, password))
@@ -50,7 +52,7 @@ impl Challenge for Day02 {
     type Output1 = usize;
     type Output2 = usize;
 
-    fn read(data: File) -> Self::Input {
+    fn read(data: File) -> Result<Self::Input, Error> {
         data.parse_lines()
     }
 

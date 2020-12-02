@@ -23,7 +23,7 @@ impl Challenge for Day01 {
     type Output1 = u32;
     type Output2 = u32;
 
-    fn read(data: File) -> Self::Input {
+    fn read(data: File) -> Result<Self::Input, Error> {
         data.parse_lines()
     }
 

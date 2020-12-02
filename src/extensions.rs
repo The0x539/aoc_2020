@@ -13,13 +13,14 @@ impl StrExt for str {
 }
 
 pub trait BufReadExt: BufRead + Sized {
-    fn parse_lines<T, V>(self) -> V
+    fn parse_lines<T, V>(self) -> Result<V, crate::Error>
     where
         T: FromStr,
         T::Err: Debug,
+        crate::Error: From<T::Err>,
         V: FromIterator<T>,
     {
-        self.lines().map(|s| s.unwrap().parse().unwrap()).collect()
+        self.lines().map(|s| Ok(s?.parse()?)).collect()
     }
 }
 

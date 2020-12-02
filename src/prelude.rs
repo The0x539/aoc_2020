@@ -5,5 +5,6 @@ pub use std::{
 
 pub use crate::extensions::*;
 pub use crate::Challenge;
+pub use crate::Error;
 
 pub type File = std::io::BufReader<std::fs::File>;

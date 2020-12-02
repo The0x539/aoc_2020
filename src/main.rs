@@ -29,7 +29,7 @@ fn main() {
 
     macro_rules! day {
         ($day:ty) => {{
-            let input = <$day>::read(data);
+            let input = <$day>::read(data).unwrap();
             match part {
                 Part::Part1 => format!("{:?}", <$day>::part1(input)),
                 Part::Part2 => format!("{:?}", <$day>::part2(input)),
