@@ -1,13 +1,7 @@
-#![allow(unused_imports, unused_variables)]
-
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    ops::RangeInclusive,
-    str::FromStr,
-};
+use crate::prelude::*;
 
 use regex::Regex;
+use std::ops::RangeInclusive;
 
 #[derive(Debug)]
 pub struct Line {
@@ -29,10 +23,8 @@ impl Line {
     fn is_valid_p2(&self) -> bool {
         let i1 = self.amt.start() - 1;
         let i2 = self.amt.end() - 1;
-        dbg!(self, i1, i2, self.password.len());
         let a = self.password.chars().nth(i1).unwrap();
         let b = self.password.chars().nth(i2).unwrap();
-        dbg!(self, i1, i2, a, b, self.password.len());
         (a == self.c) != (b == self.c)
     }
 }
@@ -53,12 +45,12 @@ impl FromStr for Line {
 
 pub enum Day02 {}
 
-impl crate::Challenge for Day02 {
+impl Challenge for Day02 {
     type Input = Vec<Line>;
     type Output1 = usize;
     type Output2 = usize;
 
-    fn read(data: BufReader<File>) -> Self::Input {
+    fn read(data: File) -> Self::Input {
         data.lines().map(|s| s.unwrap().parse().unwrap()).collect()
     }
 

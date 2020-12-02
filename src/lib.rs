@@ -12,3 +12,4 @@ pub trait Challenge {
 }
 
 pub mod days;
+pub mod prelude;
