@@ -67,28 +67,26 @@ impl Challenge for Day02 {
 mod test {
     use super::*;
 
-    #[test]
-    fn test_day02_part1() {
-        let input = [
+    fn test_input() -> [Line; 3] {
+        [
             Line::new(1..=3, 'a', "abcde".into()),
             Line::new(1..=3, 'b', "cdefg".into()),
             Line::new(2..=9, 'c', "ccccccccc".into()),
-        ];
+        ]
+    }
+
+    #[test]
+    fn test_day02_part1() {
         assert_eq!(
-            input.iter().map(Line::is_valid).collect::<Vec<_>>(),
+            test_input().iter().map(Line::is_valid).collect_vec(),
             [true, false, true]
         );
     }
 
     #[test]
     fn test_day02_part2() {
-        let input = [
-            Line::new(1..=3, 'a', "abcde".into()),
-            Line::new(1..=3, 'b', "cdefg".into()),
-            Line::new(2..=9, 'c', "ccccccccc".into()),
-        ];
         assert_eq!(
-            input.iter().map(Line::is_valid_p2).collect::<Vec<_>>(),
+            test_input().iter().map(Line::is_valid_p2).collect_vec(),
             [true, false, false]
         );
     }
