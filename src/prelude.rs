@@ -3,6 +3,7 @@ pub use std::{
     str::FromStr,
 };
 
+pub use crate::extensions::*;
 pub use crate::Challenge;
 
 pub type File = std::io::BufReader<std::fs::File>;

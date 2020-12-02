@@ -23,8 +23,8 @@ impl Line {
     fn is_valid_p2(&self) -> bool {
         let i1 = self.amt.start() - 1;
         let i2 = self.amt.end() - 1;
-        let a = self.password.chars().nth(i1).unwrap();
-        let b = self.password.chars().nth(i2).unwrap();
+        let a = self.password.nth_char(i1);
+        let b = self.password.nth_char(i2);
         (a == self.c) != (b == self.c)
     }
 }
@@ -37,7 +37,7 @@ impl FromStr for Line {
         let caps = re.captures(s).unwrap();
         let lo = caps[1].parse().unwrap();
         let hi = caps[2].parse().unwrap();
-        let c = caps[3].chars().next().unwrap();
+        let c = caps[3].nth_char(0);
         let password = caps[4].into();
         Ok(Self::new(lo..=hi, c, password))
     }
