@@ -32,6 +32,7 @@ fn main() {
     let output = match day {
         1 => day!(day01::Day01),
         2 => day!(day02::Day02),
+        3 => day!(day03::Day03),
         _ => panic!("no such day"),
     };
     println!("{}", output);
