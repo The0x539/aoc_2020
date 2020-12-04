@@ -6,8 +6,7 @@ use std::collections::HashMap;
 pub enum Day04 {}
 
 fn valid(passport: &HashMap<String, String>) -> bool {
-    let required_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-    for field in &required_fields {
+    for field in &["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"] {
         if !passport.contains_key(*field) {
             return false;
         }
@@ -24,45 +23,45 @@ fn v2(passport: &HashMap<String, String>) -> Option<()> {
         };
     }
 
-    let byr = passport.get("byr")?;
-    check!(byr.len() == 4);
-    let byr = byr.parse::<u16>().ok()?;
+    // birth year
+    let byr: u16 = passport.get("byr")?.parse().ok()?;
     check!((1920..=2002).contains(&byr));
 
-    let iyr = passport.get("iyr")?;
-    check!(iyr.len() == 4);
-    let iyr = iyr.parse::<u16>().ok()?;
+    // issue year
+    let iyr: u16 = passport.get("iyr")?.parse().ok()?;
     check!((2010..=2020).contains(&iyr));
 
-    let eyr = passport.get("eyr")?;
-    check!(eyr.len() == 4);
-    let eyr = eyr.parse::<u16>().ok()?;
+    // expiry year
+    let eyr: u16 = passport.get("eyr")?.parse().ok()?;
     check!((2020..=2030).contains(&eyr));
 
+    // height
     let hgt = passport.get("hgt")?;
     if hgt.ends_with("cm") {
         check!(hgt.len() == 5);
-        let hgt = hgt[0..3].parse::<u8>().ok()?;
+        let hgt: u8 = hgt[..3].parse().ok()?;
         check!((150..=193).contains(&hgt));
     } else if hgt.ends_with("in") {
         check!(hgt.len() == 4);
-        let hgt = hgt[0..2].parse::<u8>().ok()?;
+        let hgt: u8 = hgt[..2].parse().ok()?;
         check!((59..=76).contains(&hgt));
     } else {
         return None;
     };
 
+    // hair color
     let hcl = passport.get("hcl")?;
     check!(hcl.len() == 7);
     check!(hcl.nth_char(0) == '#');
     check!(hcl[1..].chars().all(|c| c.is_ascii_hexdigit()));
 
-    let ecl = passport.get("ecl")?;
-    check!(matches!(
-        ecl.as_str(),
-        "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"
-    ));
+    // eye color
+    let ecl = passport.get("ecl")?.as_str();
+    if !matches!(ecl, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth") {
+        return None;
+    }
 
+    // passport id
     let pid = passport.get("pid")?;
     check!(pid.len() == 9);
     check!(pid.chars().all(|c| c.is_ascii_digit()));
