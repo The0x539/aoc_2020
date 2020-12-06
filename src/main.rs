@@ -35,6 +35,7 @@ fn main() {
         3 => day!(day03::Day03),
         4 => day!(day04::Day04),
         5 => day!(day05::Day05),
+        6 => day!(day06::Day06),
         _ => panic!("no such day"),
     };
     println!("{}", output);
