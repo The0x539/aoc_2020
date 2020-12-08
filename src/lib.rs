@@ -20,6 +20,8 @@ pub enum Error {
     ParseInt(#[from] std::num::ParseIntError),
     #[error("Regex \"{0}\" didn't match \"{1}\"")]
     RegexFail(regex::Regex, String),
+    #[error("{0}")]
+    Generic(&'static str),
 }
 
 pub mod days;
