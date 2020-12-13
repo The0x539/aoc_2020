@@ -34,12 +34,12 @@ impl Challenge for Day13 {
         let mut buses = buses
             .into_iter()
             .enumerate()
-            .filter_map(|(a, b)| Some((a as u64, b? as u64)));
+            .filter_map(|(a, b)| Some((a as u64, b?)));
 
         let mut step = buses.next().unwrap().1;
         let mut t = 0;
 
-        while let Some((dt, id)) = buses.next() {
+        for (dt, id) in buses {
             while (t + dt) % id != 0 {
                 t += step;
             }
