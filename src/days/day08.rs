@@ -27,7 +27,7 @@ impl FromStr for Instruction {
             "nop" => Operation::Nop,
             "acc" => Operation::Acc,
             "jmp" => Operation::Jmp,
-            _ => return Err(Error::Generic("bad opcode")),
+            _ => Err("bad opcode")?,
         };
         let arg = s[4..].parse()?;
         Ok(Self { op, arg })

@@ -24,6 +24,12 @@ pub enum Error {
     Generic(&'static str),
 }
 
+impl From<&'static str> for Error {
+    fn from(value: &'static str) -> Self {
+        Self::Generic(value)
+    }
+}
+
 pub mod days;
 pub mod extensions;
 pub mod prelude;

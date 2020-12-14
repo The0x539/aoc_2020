@@ -20,18 +20,18 @@ impl FromStr for Instruction {
                         '0' => Some(false),
                         '1' => Some(true),
                         'X' => None,
-                        _ => return Err(Error::Generic("bad mask bit")),
+                        _ => Err("bad mask bit")?,
                     };
                 }
                 Ok(Self::Mask(mask))
             }
             "mem" => {
-                let bracket = s.find(']').ok_or(Error::Generic("bad write syntax"))?;
+                let bracket = s.find(']').ok_or("bad write syntax")?;
                 let addr = s[4..bracket].parse()?;
                 let val = s[bracket + 4..].parse()?;
                 Ok(Self::Write(addr, val))
             }
-            _ => return Err(Error::Generic("bad instr")),
+            _ => Err("bad instr")?,
         }
     }
 }

@@ -66,7 +66,7 @@ impl FromStr for Instruction {
             'L' => Action::Left,
             'R' => Action::Right,
             'F' => Action::Forward,
-            _ => return Err(Error::Generic("bad action")),
+            _ => Err("bad action")?,
         };
 
         let mut amount = s[1..].parse()?;
