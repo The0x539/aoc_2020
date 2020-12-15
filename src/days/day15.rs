@@ -14,9 +14,9 @@ fn play_until(end: u64, input: &[u64]) -> u64 {
         t += 1;
     }
     while t < end {
-        let old_t = foo.get(&last_spoken).copied().unwrap_or(t - 1);
-        let age = (t - 1) - old_t;
-        foo.insert(last_spoken, t - 1);
+        let bar = foo.entry(last_spoken).or_insert(t - 1);
+        let age = (t - 1) - *bar;
+        *bar = t - 1;
         last_spoken = age;
         t += 1;
     }
