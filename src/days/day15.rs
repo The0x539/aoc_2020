@@ -47,17 +47,31 @@ impl Challenge for Day15 {
 mod test {
     use super::*;
 
-    fn sample_input() -> <Day15 as Challenge>::Input {
-        vec![0, 3, 6]
+    fn sample_input() -> Vec<<Day15 as Challenge>::Input> {
+        vec![
+            vec![0, 3, 6],
+            vec![1, 3, 2],
+            vec![2, 1, 3],
+            vec![1, 2, 3],
+            vec![2, 3, 1],
+            vec![3, 2, 1],
+            vec![3, 1, 2],
+        ]
     }
 
     #[test]
     fn test_day15_part1() {
-        assert_eq!(Day15::part1(sample_input()), 436);
+        assert_eq!(
+            sample_input().into_iter().map(Day15::part1).collect_vec(),
+            [436, 1, 10, 27, 78, 438, 1836],
+        );
     }
 
     #[test]
     fn test_day15_part2() {
-        assert_eq!(Day15::part2(sample_input()), 175594);
+        assert_eq!(
+            sample_input().into_iter().map(Day15::part2).collect_vec(),
+            [175594, 2578, 3544142, 261214, 6895259, 18, 362],
+        );
     }
 }
