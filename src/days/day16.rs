@@ -33,6 +33,10 @@ impl Range {
     }
 }
 
+fn invalid(val: usize, fields: &HashMap<String, Range>) -> bool {
+    !fields.values().any(|range| range.contains(val))
+}
+
 fn determine_fields(fields: &HashMap<String, Range>, tickets: &[Ticket]) -> HashMap<String, usize> {
     let n_fields = fields.len();
 
@@ -42,11 +46,12 @@ fn determine_fields(fields: &HashMap<String, Range>, tickets: &[Ticket]) -> Hash
         .collect();
 
     for ticket in tickets {
+        if ticket.iter().any(|val| invalid(*val, fields)) {
+            // ticket is completely invalid
+            continue;
+        }
+
         for (i, val) in ticket.iter().enumerate() {
-            if !fields.values().any(|range| range.contains(*val)) {
-                // ticket is completely invalid
-                continue;
-            }
             for (name, map) in &mut mappings {
                 if !fields[*name].contains(*val) {
                     map.remove(&i);
@@ -131,7 +136,7 @@ impl Challenge for Day16 {
         tickets
             .iter()
             .flatten()
-            .filter(|val| !fields.values().any(|range| range.contains(**val)))
+            .filter(|val| invalid(**val, &fields))
             .sum()
     }
 
