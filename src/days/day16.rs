@@ -97,7 +97,7 @@ impl Challenge for Day16 {
         let mut lines = data.lines();
 
         let mut fields = HashMap::new();
-        while let Some(line) = lines.next() {
+        for line in lines.by_ref() {
             let line = line?;
             if line == "" {
                 break;
