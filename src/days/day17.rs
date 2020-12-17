@@ -3,8 +3,8 @@ use crate::prelude::*;
 use itertools::MinMaxResult;
 use std::{collections::HashSet, convert::TryInto, ops::RangeInclusive};
 
-type Point<const N: usize> = [i64; N];
-type Volume<const N: usize> = [RangeInclusive<i64>; N];
+type Point<const N: usize> = [i8; N];
+type Volume<const N: usize> = [RangeInclusive<i8>; N];
 type State<const N: usize> = HashSet<Point<N>>;
 
 fn neighborhood<const N: usize>(point: &Point<N>) -> Volume<N> {
@@ -49,8 +49,8 @@ fn parse<const N: usize>(input: &[Vec<bool>]) -> State<N> {
         for (x, val) in row.iter().enumerate() {
             if *val {
                 let mut point = [0; N];
-                point[0] = x as i64;
-                point[1] = y as i64;
+                point[0] = x as _;
+                point[1] = y as _;
                 state.insert(point);
             }
         }
