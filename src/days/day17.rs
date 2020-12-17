@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+use itertools::MinMaxResult;
 use std::{collections::HashSet, convert::TryInto, ops::RangeInclusive};
 
 type Point<const N: usize> = [i64; N];
@@ -18,11 +19,14 @@ fn iter_vol<const N: usize>(vol: Volume<N>) -> impl Iterator<Item = Point<N>> {
 }
 
 fn next<const N: usize>(prev: &State<N>) -> State<N> {
-    let minmax = |i| prev.iter().map(|p| p[i]).minmax().into_option().unwrap();
+    let minmax = |i| prev.iter().map(|p| p[i]).minmax();
     let mut vol = [0; N].map(|_| 0..=0); // stupid non-Copy ranges and non-Default arrays
     for i in 0..N {
-        let (min, max) = minmax(i);
-        vol[i] = (min - 1)..=(max + 1);
+        vol[i] = match minmax(i) {
+            MinMaxResult::MinMax(min, max) => (min - 1)..=(max + 1),
+            // if there aren't at least 3 live cells, next gen has no life
+            _ => return HashSet::new(),
+        };
     }
 
     let mut new = HashSet::new();
