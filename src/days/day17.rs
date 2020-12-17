@@ -1,98 +1,66 @@
 use crate::prelude::*;
 
-use itertools::iproduct;
-use std::{collections::HashSet, ops::RangeInclusive};
+use std::{collections::HashSet, convert::TryInto, ops::RangeInclusive};
 
-type Point = [i64; 3];
-type Point4 = [i64; 4];
-type State = HashSet<Point>;
-type State4 = HashSet<Point4>;
+type Point<const N: usize> = [i64; N];
+type Volume<const N: usize> = [RangeInclusive<i64>; N];
+type State<const N: usize> = HashSet<Point<N>>;
 
-fn volume(xyz: [(i64, i64); 3]) -> [RangeInclusive<i64>; 3] {
-    let [(x0, x1), (y0, y1), (z0, z1)] = xyz;
-    [
-        (x0 - 1)..=(x1 + 1),
-        (y0 - 1)..=(y1 + 1),
-        (z0 - 1)..=(z1 + 1),
-    ]
+fn neighborhood<const N: usize>(point: Point<N>) -> Volume<N> {
+    let v = point
+        .iter()
+        .copied()
+        .map(|a| (a, a))
+        .collect_vec()
+        .try_into()
+        .unwrap();
+    volume(v)
 }
 
-fn volume4(xyzw: [(i64, i64); 4]) -> [RangeInclusive<i64>; 4] {
-    let [(x0, x1), (y0, y1), (z0, z1), (w0, w1)] = xyzw;
-    [
-        (x0 - 1)..=(x1 + 1),
-        (y0 - 1)..=(y1 + 1),
-        (z0 - 1)..=(z1 + 1),
-        (w0 - 1)..=(w1 + 1),
-    ]
+fn volume<const N: usize>(minmaxes: [(i64, i64); N]) -> Volume<N> {
+    minmaxes
+        .iter()
+        .copied()
+        .map(|(a0, a1)| (a0 - 1)..=(a1 + 1))
+        .collect_vec()
+        .try_into()
+        .unwrap()
 }
 
-fn iter_vol(vol: [RangeInclusive<i64>; 3]) -> impl Iterator<Item = Point> {
-    let [vx, vy, vz] = vol;
-    iproduct!(vx, vy, vz).map(|(x, y, z)| [x, y, z])
+fn iter_vol<const N: usize>(vol: Volume<N>) -> impl Iterator<Item = Point<N>> {
+    vol.iter()
+        .cloned()
+        .multi_cartesian_product()
+        .map(|p| p.try_into().unwrap())
 }
 
-fn iter_vol4(vol: [RangeInclusive<i64>; 4]) -> impl Iterator<Item = Point4> {
-    let [vx, vy, vz, vw] = vol;
-    iproduct!(vx, vy, vz, vw).map(|(x, y, z, w)| [x, y, z, w])
-}
-
-fn next(prev: &State) -> State {
+fn next<const N: usize>(prev: &State<N>) -> State<N> {
     let minmax = |i| prev.iter().map(|p| p[i]).minmax().into_option().unwrap();
-    let vol = volume([minmax(0), minmax(1), minmax(2)]);
+    let vol = volume((0..N).map(minmax).collect_vec().try_into().unwrap());
 
     let mut new = HashSet::new();
-    for [x, y, z] in iter_vol(vol) {
-        let neighborhood = volume([(x, x), (y, y), (z, z)]);
-        let neighbor_count = iter_vol(neighborhood)
-            .filter(|p| p != &[x, y, z])
+    for cell in iter_vol(vol) {
+        let neighbor_count = iter_vol(neighborhood(cell))
+            .filter(|p| p != &cell)
             .filter(|p| prev.contains(p))
             .count();
 
-        if neighbor_count == 3 || (neighbor_count == 2 && prev.contains(&[x, y, z])) {
-            new.insert([x, y, z]);
+        if neighbor_count == 3 || (neighbor_count == 2 && prev.contains(&cell)) {
+            new.insert(cell);
         }
     }
     new
 }
 
-fn next4(prev: &State4) -> State4 {
-    let minmax = |i| prev.iter().map(|p| p[i]).minmax().into_option().unwrap();
-    let vol = volume4([minmax(0), minmax(1), minmax(2), minmax(3)]);
-
-    let mut new = HashSet::new();
-    for [x, y, z, w] in iter_vol4(vol) {
-        let neighborhood = volume4([(x, x), (y, y), (z, z), (w, w)]);
-        let neighbor_count = iter_vol4(neighborhood)
-            .filter(|p| p != &[x, y, z, w])
-            .filter(|p| prev.contains(p))
-            .count();
-
-        if neighbor_count == 3 || (neighbor_count == 2 && prev.contains(&[x, y, z, w])) {
-            new.insert([x, y, z, w]);
-        }
-    }
-    new
-}
-
-fn parse(input: &[Vec<bool>]) -> State {
+fn parse<const N: usize>(input: &[Vec<bool>]) -> State<N> {
     let mut state = HashSet::new();
     for (y, row) in input.iter().enumerate() {
         for (x, val) in row.iter().enumerate() {
             if *val {
-                state.insert([x as _, y as _, 0]);
-            }
-        }
-    }
-    state
-}
-
-fn parse4(input: &[Vec<bool>]) -> State4 {
-    let mut state = HashSet::new();
-    for (y, row) in input.iter().enumerate() {
-        for (x, val) in row.iter().enumerate() {
-            if *val {
-                state.insert([x as _, y as _, 0, 0]);
+                let mut point = [0; N];
+                point[0] = x as i64;
+                point[1] = y as i64;
+                state.insert(point);
             }
         }
     }
@@ -116,15 +84,15 @@ impl Challenge for Day17 {
     fn part1(input: Self::Input) -> Self::Output1 {
         let mut state = parse(&input);
         for _ in 0..6 {
-            state = next(&state);
+            state = next::<3>(&state);
         }
         state.len()
     }
 
     fn part2(input: Self::Input) -> Self::Output2 {
-        let mut state = parse4(&input);
+        let mut state = parse(&input);
         for _ in 0..6 {
-            state = next4(&state);
+            state = next::<4>(&state);
         }
         state.len()
     }

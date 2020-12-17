@@ -1,3 +1,5 @@
+#![feature(min_const_generics)]
+
 use std::{fmt::Debug, fs::File, io::BufReader};
 use thiserror::Error;
 
