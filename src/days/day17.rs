@@ -1,46 +1,33 @@
 use crate::prelude::*;
 
-use std::{collections::HashSet, convert::TryInto, ops::RangeInclusive};
+use std::{collections::HashSet, ops::RangeInclusive};
 
-type Point<const N: usize> = [i64; N];
-type Volume<const N: usize> = [RangeInclusive<i64>; N];
-type State<const N: usize> = HashSet<Point<N>>;
+type Point = Vec<i64>;
+type Volume = Vec<RangeInclusive<i64>>;
+type State = HashSet<Point>;
 
-fn neighborhood<const N: usize>(point: Point<N>) -> Volume<N> {
-    let v = point
-        .iter()
-        .copied()
-        .map(|a| (a, a))
-        .collect_vec()
-        .try_into()
-        .unwrap();
-    volume(v)
-}
-
-fn volume<const N: usize>(minmaxes: [(i64, i64); N]) -> Volume<N> {
+fn volume(minmaxes: Vec<(i64, i64)>) -> Volume {
     minmaxes
-        .iter()
-        .copied()
+        .into_iter()
         .map(|(a0, a1)| (a0 - 1)..=(a1 + 1))
-        .collect_vec()
-        .try_into()
-        .unwrap()
+        .collect()
 }
 
-fn iter_vol<const N: usize>(vol: Volume<N>) -> impl Iterator<Item = Point<N>> {
-    vol.iter()
-        .cloned()
-        .multi_cartesian_product()
-        .map(|p| p.try_into().unwrap())
+fn neighborhood(point: &Point) -> Volume {
+    volume(point.iter().map(|&a| (a, a)).collect())
 }
 
-fn next<const N: usize>(prev: &State<N>) -> State<N> {
+fn iter_vol(vol: Volume) -> impl Iterator<Item = Point> {
+    vol.into_iter().multi_cartesian_product()
+}
+
+fn next(prev: &State, dims: usize) -> State {
     let minmax = |i| prev.iter().map(|p| p[i]).minmax().into_option().unwrap();
-    let vol = volume((0..N).map(minmax).collect_vec().try_into().unwrap());
+    let vol = volume((0..dims).map(minmax).collect());
 
     let mut new = HashSet::new();
     for cell in iter_vol(vol) {
-        let neighbor_count = iter_vol(neighborhood(cell))
+        let neighbor_count = iter_vol(neighborhood(&cell))
             .filter(|p| p != &cell)
             .filter(|p| prev.contains(p))
             .count();
@@ -52,12 +39,12 @@ fn next<const N: usize>(prev: &State<N>) -> State<N> {
     new
 }
 
-fn parse<const N: usize>(input: &[Vec<bool>]) -> State<N> {
+fn parse(input: &[Vec<bool>], dims: usize) -> State {
     let mut state = HashSet::new();
     for (y, row) in input.iter().enumerate() {
         for (x, val) in row.iter().enumerate() {
             if *val {
-                let mut point = [0; N];
+                let mut point = vec![0; dims];
                 point[0] = x as i64;
                 point[1] = y as i64;
                 state.insert(point);
@@ -82,17 +69,17 @@ impl Challenge for Day17 {
     }
 
     fn part1(input: Self::Input) -> Self::Output1 {
-        let mut state = parse(&input);
+        let mut state = parse(&input, 3);
         for _ in 0..6 {
-            state = next::<3>(&state);
+            state = next(&state, 3);
         }
         state.len()
     }
 
     fn part2(input: Self::Input) -> Self::Output2 {
-        let mut state = parse(&input);
+        let mut state = parse(&input, 4);
         for _ in 0..6 {
-            state = next::<4>(&state);
+            state = next(&state, 4);
         }
         state.len()
     }
