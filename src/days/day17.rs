@@ -1,29 +1,29 @@
 use crate::prelude::*;
 
-use std::{collections::HashSet, ops::RangeInclusive};
+use std::{collections::HashSet, convert::TryInto, ops::RangeInclusive};
 
-type Point = Vec<i64>;
-type Volume = Vec<RangeInclusive<i64>>;
-type State = HashSet<Point>;
+type Point<const N: usize> = [i64; N];
+type Volume<const N: usize> = [RangeInclusive<i64>; N];
+type State<const N: usize> = HashSet<Point<N>>;
 
-fn volume(minmaxes: Vec<(i64, i64)>) -> Volume {
-    minmaxes
-        .into_iter()
-        .map(|(a0, a1)| (a0 - 1)..=(a1 + 1))
-        .collect()
+fn neighborhood<const N: usize>(point: &Point<N>) -> Volume<N> {
+    point.map(|a| (a - 1)..=(a + 1))
 }
 
-fn neighborhood(point: &Point) -> Volume {
-    volume(point.iter().map(|&a| (a, a)).collect())
+fn iter_vol<const N: usize>(vol: Volume<N>) -> impl Iterator<Item = Point<N>> {
+    vol.iter()
+        .cloned()
+        .multi_cartesian_product()
+        .map(|p| p.try_into().unwrap())
 }
 
-fn iter_vol(vol: Volume) -> impl Iterator<Item = Point> {
-    vol.into_iter().multi_cartesian_product()
-}
-
-fn next(prev: &State, dims: usize) -> State {
+fn next<const N: usize>(prev: &State<N>) -> State<N> {
     let minmax = |i| prev.iter().map(|p| p[i]).minmax().into_option().unwrap();
-    let vol = volume((0..dims).map(minmax).collect());
+    let mut vol = [0; N].map(|_| 0..=0); // stupid non-Copy ranges and non-Default arrays
+    for i in 0..N {
+        let (min, max) = minmax(i);
+        vol[i] = (min - 1)..=(max + 1);
+    }
 
     let mut new = HashSet::new();
     for cell in iter_vol(vol) {
@@ -39,12 +39,12 @@ fn next(prev: &State, dims: usize) -> State {
     new
 }
 
-fn parse(input: &[Vec<bool>], dims: usize) -> State {
+fn parse<const N: usize>(input: &[Vec<bool>]) -> State<N> {
     let mut state = HashSet::new();
     for (y, row) in input.iter().enumerate() {
         for (x, val) in row.iter().enumerate() {
             if *val {
-                let mut point = vec![0; dims];
+                let mut point = [0; N];
                 point[0] = x as i64;
                 point[1] = y as i64;
                 state.insert(point);
@@ -69,17 +69,17 @@ impl Challenge for Day17 {
     }
 
     fn part1(input: Self::Input) -> Self::Output1 {
-        let mut state = parse(&input, 3);
+        let mut state: State<3> = parse(&input);
         for _ in 0..6 {
-            state = next(&state, 3);
+            state = next(&state);
         }
         state.len()
     }
 
     fn part2(input: Self::Input) -> Self::Output2 {
-        let mut state = parse(&input, 4);
+        let mut state: State<4> = parse(&input);
         for _ in 0..6 {
-            state = next(&state, 4);
+            state = next(&state);
         }
         state.len()
     }
