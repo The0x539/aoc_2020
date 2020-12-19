@@ -71,88 +71,41 @@ fn match_rule<'a>(mut s: &'a str, rule: &Rule, rules: &HashMap<usize, Rule>) -> 
         }
         Rule::Alt(l, r) => match_rule(s, &Rule::Seq(l.clone()), rules)
             .or_else(|| match_rule(s, &Rule::Seq(r.clone()), rules)),
-        /*
-        Rule::Alt(l, r) => match (&l[..], &r[..]) {
-            ([a], [b, c]) if a == b && &rules[c] == rule => {
-                let repeated_rule = &rules[a];
-                s = match_rule(s, repeated_rule, rules)?; // must match at least one
-                while let Some(new_s) = match_rule(s, repeated_rule, rules) {
-                    s = new_s;
-                }
-                println!("rule 8 matched, yielding {}", s);
-                Some(s)
-            }
-            ([a, b], [c, d, e]) if (a, b) == (c, e) && &rules[d] == rule => {
-                let left_repeat = &rules[dbg!(a)];
-                let right_repeat = &rules[b];
-                println!("foo");
-                s = match_rule(dbg!(s), left_repeat, rules)?; // must match at least one
-                println!("bar");
-                let mut n = 1;
-                while let Some(new_s) = match_rule(s, left_repeat, rules) {
-                    n += 1;
-                    s = new_s;
-                }
-                println!("left half of rule 11 matched {} times", n);
-                for _ in 0..n {
-                    s = match_rule(s, right_repeat, rules)?;
-                }
-                println!("rule 11 matched");
-                Some(s)
-            }
-            _ => match_rule(s, &Rule::Seq(l.clone()), rules)
-                .or_else(|| match_rule(s, &Rule::Seq(r.clone()), rules)),
-        },
-        */
-    }
-}
-
-fn match_suffix<'a>(mut s: &'a str, rule: &Rule, rules: &HashMap<usize, Rule>) -> Option<&'a str> {
-    match rule {
-        Rule::Lit(Char::A) => s.strip_suffix('a'),
-        Rule::Lit(Char::B) => s.strip_suffix('b'),
-        Rule::Seq(seq) => {
-            for idx in seq.iter().rev() {
-                s = match_suffix(s, &rules[idx], rules)?;
-            }
-            Some(s)
-        }
-        Rule::Alt(l, r) => match_suffix(s, &Rule::Seq(l.clone()), rules)
-            .or_else(|| match_suffix(s, &Rule::Seq(r.clone()), rules)),
     }
 }
 
 fn match_part2(mut s: &str, rules: &HashMap<usize, Rule>) -> bool {
-    // rule 11 requires at least one 42+31 pair
-    s = match match_suffix(s, &rules[&31], rules) {
-        Some(new_s) => new_s,
-        None => return false,
-    };
-
-    let mut num_pairs = 1;
-    // right half of rule 11
-    while let Some(new_s) = match_suffix(s, &rules[&31], rules) {
-        s = new_s;
-        num_pairs += 1;
-    }
-    // left half of rule 11
-    for _ in 0..num_pairs {
-        if let Some(new_s) = match_suffix(s, &rules[&42], rules) {
-            s = new_s;
-        }
-    }
-
-    // rule 8 requires at least one standalone 42
-    s = match match_rule(s, &rules[&42], rules) {
-        Some(new_s) => new_s,
-        None => return false,
-    };
-
-    // rule 8
+    let mut num_42 = 0;
     while let Some(new_s) = match_rule(s, &rules[&42], rules) {
         s = new_s;
+        num_42 += 1;
     }
-    s == ""
+    // rule 8 and rule 11 each require at least one 42.
+    if num_42 < 2 {
+        return false;
+    }
+
+    let mut num_31 = 0;
+    while let Some(new_s) = match_rule(s, &rules[&31], rules) {
+        s = new_s;
+        num_31 += 1;
+    }
+
+    if s != "" {
+        // the string didn't consist entirely of (42)*(31)*, so the counts don't even matter
+        false
+    } else if num_31 > num_42 {
+        // not enough 42s to pair with the 31s, so rule 11 not matched
+        false
+    } else if num_31 == num_42 {
+        // the 42s and the 31s paired up, sure, but rule 8 requires at least one 42 for itself
+        false
+    } else if num_31 == 0 {
+        // there has to be at least one
+        false
+    } else {
+        true
+    }
 }
 
 pub enum Day19 {}
