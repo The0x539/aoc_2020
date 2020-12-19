@@ -137,13 +137,7 @@ impl Challenge for Day19 {
     }
 
     fn part2((rules, msgs): Self::Input) -> Self::Output2 {
-        let mut count = 0;
-        for msg in msgs {
-            if match_part2(&msg, &rules) {
-                count += 1;
-            }
-        }
-        count
+        msgs.iter().filter(|m| match_part2(m, &rules)).count()
     }
 }
 
