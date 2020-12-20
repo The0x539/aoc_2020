@@ -184,7 +184,7 @@ fn do_part2<const N: usize>(img: Tile<N>) -> usize {
 
     for img in img.orientations() {
         let mut monster_count = 0;
-        for rows in img.pixels.windows(monster.len()) {
+        for rows in img.pixels.windows(3) {
             let (t, m, b) = match rows {
                 [t, m, b] => (t, m, b),
                 _ => unreachable!(),
