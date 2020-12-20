@@ -128,18 +128,18 @@ fn assemble(
 
         'next_tile: for (id, tile) in tiles {
             for piece in tile.orientations() {
-                'next_pos: for (x, y) in img.keys().copied().collect_vec() {
-                    let pos = (x, y);
+                'next_pos: for (pos, o) in &img {
+                    let (x, y) = *pos;
                     let (above, below, left, right) =
                         ((x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y));
 
-                    let placement = if !img.contains_key(&above) && piece.fits_above(&img[&pos]) {
+                    let placement = if !img.contains_key(&above) && piece.fits_above(o) {
                         above
-                    } else if !img.contains_key(&below) && piece.fits_below(&img[&pos]) {
+                    } else if !img.contains_key(&below) && piece.fits_below(o) {
                         below
-                    } else if !img.contains_key(&left) && piece.fits_left(&img[&pos]) {
+                    } else if !img.contains_key(&left) && piece.fits_left(o) {
                         left
-                    } else if !img.contains_key(&right) && piece.fits_right(&img[&pos]) {
+                    } else if !img.contains_key(&right) && piece.fits_right(o) {
                         right
                     } else {
                         continue 'next_pos;
