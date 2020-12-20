@@ -126,29 +126,27 @@ fn assemble(
     while tiles.len() > 0 {
         let mut failed = HashMap::new();
 
-        'foo: for (id, tile) in tiles {
+        'next_tile: for (id, tile) in tiles {
             for piece in tile.orientations() {
-                for (x, y) in img.keys().copied().collect_vec() {
+                'next_pos: for (x, y) in img.keys().copied().collect_vec() {
                     let pos = (x, y);
                     let (above, below, left, right) =
                         ((x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y));
 
-                    if !img.contains_key(&above) && piece.fits_above(&img[&pos]) {
-                        ids.insert(above, id);
-                        img.insert(above, piece);
+                    let placement = if !img.contains_key(&above) && piece.fits_above(&img[&pos]) {
+                        above
                     } else if !img.contains_key(&below) && piece.fits_below(&img[&pos]) {
-                        ids.insert(below, id);
-                        img.insert(below, piece);
+                        below
                     } else if !img.contains_key(&left) && piece.fits_left(&img[&pos]) {
-                        ids.insert(left, id);
-                        img.insert(left, piece);
+                        left
                     } else if !img.contains_key(&right) && piece.fits_right(&img[&pos]) {
-                        ids.insert(right, id);
-                        img.insert(right, piece);
+                        right
                     } else {
-                        continue;
-                    }
-                    continue 'foo;
+                        continue 'next_pos;
+                    };
+                    ids.insert(placement, id);
+                    img.insert(placement, piece);
+                    continue 'next_tile;
                 }
             }
 
