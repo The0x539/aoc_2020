@@ -112,8 +112,8 @@ fn parse(s: &str) -> Result<<Day20 as Challenge>::Input, Error> {
 }
 
 fn assemble(
-    mut tiles: HashMap<usize, Tile<10>>,
-) -> (HashMap<(i8, i8), Tile<10>>, HashMap<(i8, i8), usize>) {
+    mut tiles: HashMap<u64, Tile<10>>,
+) -> (HashMap<(i8, i8), Tile<10>>, HashMap<(i8, i8), u64>) {
     let mut img = HashMap::new();
     let mut ids = HashMap::new();
 
@@ -208,8 +208,8 @@ fn do_part2<const N: usize>(img: Tile<N>) -> usize {
 pub enum Day20 {}
 
 impl Challenge for Day20 {
-    type Input = HashMap<usize, Tile<10>>;
-    type Output1 = usize;
+    type Input = HashMap<u64, Tile<10>>;
+    type Output1 = u64;
     type Output2 = usize;
 
     fn read(mut data: File) -> Result<Self::Input, Error> {
