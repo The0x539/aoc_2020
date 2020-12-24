@@ -74,32 +74,19 @@ fn next_gen(prev: &HashMap<(i32, i32), bool>) -> HashMap<(i32, i32), bool> {
 
     for (&pos, &black) in prev.iter() {
         if black {
-            for dir in vec![
-                Direction::East,
-                Direction::Southeast,
-                Direction::Southwest,
-                Direction::West,
-                Direction::Northwest,
-                Direction::Northeast,
-            ] {
+            for dir in Direction::from_bytes(b"eseswwnwne") {
                 let (dx, dy) = dir.to_offset();
                 let pos2 = (pos.0 + dx, pos.1 + dy);
                 let n = neighbor_counts.entry(pos2).or_default();
                 *n += 1;
             }
-        } else {
-            neighbor_counts.entry(pos).or_default();
         }
     }
 
     neighbor_counts
         .into_iter()
         .map(|(pos, n)| {
-            let is_black = if prev.get(&pos) == Some(&true) {
-                n == 1 || n == 2
-            } else {
-                n == 2
-            };
+            let is_black = n == 2 || (n == 1 && prev.get(&pos) == Some(&true));
             (pos, is_black)
         })
         .collect()
