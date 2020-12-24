@@ -25,11 +25,11 @@ impl Direction {
             let dir = match take_byte(&mut b) {
                 b'e' => Self::East,
                 b'w' => Self::West,
-                c => match (c, take_byte(&mut b)) {
-                    (b's', b'e') => Self::Southeast,
-                    (b's', b'w') => Self::Southwest,
-                    (b'n', b'w') => Self::Northwest,
-                    (b'n', b'e') => Self::Northeast,
+                c => match &[c, take_byte(&mut b)] {
+                    b"se" => Self::Southeast,
+                    b"sw" => Self::Southwest,
+                    b"nw" => Self::Northwest,
+                    b"ne" => Self::Northeast,
                     _ => panic!("wat"),
                 },
             };
