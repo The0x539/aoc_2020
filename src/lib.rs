@@ -1,5 +1,3 @@
-#![feature(min_const_generics, array_map)]
-
 use std::{fmt::Debug, fs::File, io::BufReader};
 use thiserror::Error;
 
